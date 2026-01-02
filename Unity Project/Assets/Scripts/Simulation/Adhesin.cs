@@ -50,7 +50,7 @@ public class Adhesin : MonoBehaviour {
         Vector2 displacement = Cell2.transform.position - Cell1.transform.position;
         if (displacement == Vector2.zero)
         {
-            displacement = Cell2Physics.velocity - Cell1Physics.velocity;
+            displacement = Cell2Physics.linearVelocity - Cell1Physics.linearVelocity;
         }
         float angle = -Mathf.Atan2(displacement.x, displacement.y) / Mathf.PI * 180f + 90;
         transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
@@ -128,7 +128,7 @@ public class Adhesin : MonoBehaviour {
             }
             else
             {
-                Vector2 dv = Cell1Physics.velocity - Cell2Physics.velocity;
+                Vector2 dv = Cell1Physics.linearVelocity - Cell2Physics.linearVelocity;
                 float displacementAngle = Mathf.Atan2(displacement.y, displacement.x);
                 float velocityAngle = Mathf.Atan2(dv.y, dv.x);
                 if (Mathf.Abs(velocityAngle - displacementAngle) > Mathf.PI / 1.5f)

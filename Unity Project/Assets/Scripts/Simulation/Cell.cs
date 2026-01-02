@@ -78,8 +78,8 @@ public class Cell : MonoBehaviour {
 
         Vector2 splitVelocity = new Vector2(-.3f, 0).Rotate(transform.eulerAngles.z + genome[CellModeIndex].SplitAngle);
 
-        child1physics.velocity = physics.velocity + splitVelocity;
-        child2physics.velocity = physics.velocity - splitVelocity;
+        child1physics.linearVelocity = physics.linearVelocity + splitVelocity;
+        child2physics.linearVelocity = physics.linearVelocity - splitVelocity;
 
         //Component[] child1Components = child1.GetComponents<Component>();
         //Component[] child2Components = child2.GetComponents<Component>();

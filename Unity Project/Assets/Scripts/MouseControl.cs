@@ -16,15 +16,15 @@ public class MouseControl : MonoBehaviour {
     void Update () {
         float x = Input.GetAxis("Horizontal");
         float y = Input.GetAxis("Vertical");
-        if (body.velocity.magnitude > maxSpeed)
+        if (body.linearVelocity.magnitude > maxSpeed)
         {
-            if ((x > 0 && body.velocity.x > 0) ||
-                (x < 0 && body.velocity.x < 0))
+            if ((x > 0 && body.linearVelocity.x > 0) ||
+                (x < 0 && body.linearVelocity.x < 0))
             { // Same Direction in X
                 x = 0;
             }
-            if ((y > 0 && body.velocity.y > 0) ||
-                (y < 0 && body.velocity.y < 0))
+            if ((y > 0 && body.linearVelocity.y > 0) ||
+                (y < 0 && body.linearVelocity.y < 0))
             { // Same Direction in Y
                 y = 0;
             }
