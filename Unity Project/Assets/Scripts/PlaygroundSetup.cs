@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// Configura a cena Playground para jogar.
@@ -17,10 +18,11 @@ public class PlaygroundSetup : MonoBehaviour
 
     [Header("Configuração Inicial")]
     public bool StartInMicroscopeMode = true;
-
-    [Header("UI (opcional)")]
-    public UnityEngine.UI.Text InstructionsText;
-    public UnityEngine.UI.Text CellCountText;
+    
+    [Header("UI")]
+    public bool AutoCreateUI = true;
+    public Text InstructionsText;
+    public Text CellCountText;
 
     private void Awake()
     {
@@ -36,7 +38,6 @@ public class PlaygroundSetup : MonoBehaviour
     private void Start()
     {
         // Auto-encontrar referências se não foram atribuídas
-        // Nota: FindAnyObjectByType com includeInactive encontra objetos desativados
         if (Microscope == null)
         {
             Microscope = FindAnyObjectByType<Microscope>(FindObjectsInactive.Include);
@@ -48,6 +49,11 @@ public class PlaygroundSetup : MonoBehaviour
         }
         
         // Conectar ContextManager às mesmas referências
+        if (ContextManager == null)
+        {
+            ContextManager = FindAnyObjectByType<ContextManager>(FindObjectsInactive.Include);
+        }
+        
         if (ContextManager != null)
         {
             ContextManager.Microscope = Microscope;
@@ -59,7 +65,6 @@ public class PlaygroundSetup : MonoBehaviour
         
         if (GenomeEditor != null)
         {
-            // Se o genoma do editor está vazio, usar o padrão
             if (GenomeEditor.CurrentGenome.ModeCount == 0)
             {
                 GenomeEditor.CurrentGenome = defaultGenome;
@@ -83,6 +88,12 @@ public class PlaygroundSetup : MonoBehaviour
             Debug.Log("[PlaygroundSetup] Microscope configurado com genoma de " + genomeToUse.ModeCount + " modos");
         }
 
+        // Criar UI automaticamente se necessário
+        if (AutoCreateUI && (InstructionsText == null || CellCountText == null))
+        {
+            CreateUI();
+        }
+
         // Ativa modo inicial
         if (StartInMicroscopeMode)
         {
@@ -100,6 +111,77 @@ public class PlaygroundSetup : MonoBehaviour
         }
 
         Debug.Log("[PlaygroundSetup] Cena pronta! Clique para criar células.");
+    }
+
+    /// <summary>
+    /// Cria Canvas e textos de UI automaticamente.
+    /// </summary>
+    private void CreateUI()
+    {
+        // Procurar Canvas existente ou criar novo
+        Canvas canvas = FindAnyObjectByType<Canvas>();
+        GameObject canvasObj;
+        
+        if (canvas == null)
+        {
+            canvasObj = new GameObject("PlaygroundCanvas");
+            canvas = canvasObj.AddComponent<Canvas>();
+            canvas.renderMode = RenderMode.ScreenSpaceOverlay;
+            canvasObj.AddComponent<CanvasScaler>();
+            canvasObj.AddComponent<GraphicRaycaster>();
+            Debug.Log("[PlaygroundSetup] Canvas criado automaticamente");
+        }
+        else
+        {
+            canvasObj = canvas.gameObject;
+        }
+
+        // Tentar obter fonte padrão
+        Font defaultFont = Resources.GetBuiltinResource<Font>("Arial.ttf");
+        if (defaultFont == null)
+        {
+            defaultFont = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        }
+
+        // Criar texto de instruções (topo centro)
+        if (InstructionsText == null)
+        {
+            GameObject instrObj = new GameObject("Instructions");
+            instrObj.transform.SetParent(canvasObj.transform, false);
+            InstructionsText = instrObj.AddComponent<Text>();
+            InstructionsText.font = defaultFont;
+            InstructionsText.fontSize = 18;
+            InstructionsText.color = Color.white;
+            InstructionsText.alignment = TextAnchor.UpperCenter;
+            
+            RectTransform rt = instrObj.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0, 1);
+            rt.anchorMax = new Vector2(1, 1);
+            rt.pivot = new Vector2(0.5f, 1);
+            rt.anchoredPosition = new Vector2(0, -10);
+            rt.sizeDelta = new Vector2(0, 30);
+        }
+
+        // Criar texto de contagem (topo esquerda)
+        if (CellCountText == null)
+        {
+            GameObject countObj = new GameObject("CellCount");
+            countObj.transform.SetParent(canvasObj.transform, false);
+            CellCountText = countObj.AddComponent<Text>();
+            CellCountText.font = defaultFont;
+            CellCountText.fontSize = 24;
+            CellCountText.color = Color.yellow;
+            CellCountText.alignment = TextAnchor.UpperLeft;
+            
+            RectTransform rt = countObj.GetComponent<RectTransform>();
+            rt.anchorMin = new Vector2(0, 1);
+            rt.anchorMax = new Vector2(0, 1);
+            rt.pivot = new Vector2(0, 1);
+            rt.anchoredPosition = new Vector2(10, -40);
+            rt.sizeDelta = new Vector2(200, 40);
+        }
+
+        Debug.Log("[PlaygroundSetup] UI criada automaticamente");
     }
 
     /// <summary>

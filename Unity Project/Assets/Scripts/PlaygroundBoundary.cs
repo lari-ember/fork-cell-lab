@@ -14,9 +14,26 @@ public class PlaygroundBoundary : MonoBehaviour
     [Tooltip("Número de segmentos do círculo (mais = mais suave)")]
     public int Segments = 64;
 
+    [Header("Visualização")]
+    [Tooltip("Mostrar a borda visualmente durante o jogo")]
+    public bool ShowVisualBorder = true;
+    
+    [Tooltip("Cor da borda")]
+    public Color BorderColor = Color.cyan;
+    
+    [Tooltip("Espessura da linha")]
+    public float LineWidth = 0.05f;
+
+    private LineRenderer lineRenderer;
+
     private void Start()
     {
         CreateCircularBoundary();
+        
+        if (ShowVisualBorder)
+        {
+            CreateVisualBorder();
+        }
     }
 
     /// <summary>
@@ -38,11 +55,44 @@ public class PlaygroundBoundary : MonoBehaviour
     }
 
     /// <summary>
+    /// Cria um LineRenderer para mostrar a borda visualmente durante o jogo.
+    /// </summary>
+    private void CreateVisualBorder()
+    {
+        // Criar ou obter LineRenderer
+        lineRenderer = GetComponent<LineRenderer>();
+        if (lineRenderer == null)
+        {
+            lineRenderer = gameObject.AddComponent<LineRenderer>();
+        }
+
+        // Configurar material simples
+        lineRenderer.material = new Material(Shader.Find("Sprites/Default"));
+        lineRenderer.startColor = BorderColor;
+        lineRenderer.endColor = BorderColor;
+        lineRenderer.startWidth = LineWidth;
+        lineRenderer.endWidth = LineWidth;
+        lineRenderer.useWorldSpace = false;
+        lineRenderer.loop = true;
+
+        // Criar pontos do círculo
+        lineRenderer.positionCount = Segments;
+        for (int i = 0; i < Segments; i++)
+        {
+            float angle = (i / (float)Segments) * Mathf.PI * 2f;
+            Vector3 point = new Vector3(Mathf.Cos(angle), Mathf.Sin(angle), 0) * Radius;
+            lineRenderer.SetPosition(i, point);
+        }
+
+        Debug.Log("[PlaygroundBoundary] Borda visual criada");
+    }
+
+    /// <summary>
     /// Desenha o círculo no editor para visualização.
     /// </summary>
     private void OnDrawGizmos()
     {
-        Gizmos.color = Color.cyan;
+        Gizmos.color = BorderColor;
         
         for (int i = 0; i < Segments; i++)
         {
@@ -61,9 +111,16 @@ public class PlaygroundBoundary : MonoBehaviour
     /// </summary>
     private void OnValidate()
     {
-        if (Application.isPlaying && GetComponent<EdgeCollider2D>() != null)
+        if (Application.isPlaying)
         {
-            CreateCircularBoundary();
+            if (GetComponent<EdgeCollider2D>() != null)
+            {
+                CreateCircularBoundary();
+            }
+            if (ShowVisualBorder && lineRenderer != null)
+            {
+                CreateVisualBorder();
+            }
         }
     }
 }
