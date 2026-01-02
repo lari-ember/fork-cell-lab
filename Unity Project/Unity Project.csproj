@@ -96,6 +96,8 @@
     <Compile Include="Assets\Scripts\InitInverted2DEdges.cs" />
     <Compile Include="Assets\Scripts\Microscope.cs" />
     <Compile Include="Assets\Scripts\MouseControl.cs" />
+    <Compile Include="Assets\Scripts\PlaygroundBoundary.cs" />
+    <Compile Include="Assets\Scripts\PlaygroundSetup.cs" />
     <Compile Include="Assets\Scripts\ShowGizmos.cs" />
     <Compile Include="Assets\Scripts\Simulation\Adhesin.cs" />
     <Compile Include="Assets\Scripts\Simulation\AgeDeath.cs" />
